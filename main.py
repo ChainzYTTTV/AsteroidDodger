@@ -1,3 +1,4 @@
+import math
 import pygame
 import random
 import time
@@ -15,7 +16,7 @@ pygame.display.set_caption("Asteroid Dodger")
 
 FPS = 60
 
-def draw(player, enemies, font, level):
+def draw(player, enemies, font, level, frame):
 
     player.draw(WIN)
 
@@ -23,7 +24,9 @@ def draw(player, enemies, font, level):
         enemy.draw(WIN)
 
     levelText = font.render(f"Level: {level}", True, (255, 255, 255))
-    textRect = levelText.get_rect(center=(WIDTH // 2, 30))
+    float_offset_x = math.sin(frame * 0.001) * 10
+    float_offset_y = math.sin(frame * 0.001 * 2) * 5
+    textRect = levelText.get_rect(center=(WIDTH // 2 + float_offset_x, 30 + float_offset_y))
     WIN.blit(levelText, textRect)
 
     barWidth = 200
@@ -52,6 +55,7 @@ def main():
     font = pygame.font.Font(None, 32)
 
     healedThisLevel = False
+    frame = 0
 
     try:
         with open("highscore.txt", "r") as f:
@@ -60,6 +64,7 @@ def main():
         highscore = 0
 
     while running:
+        frame += 1
         clock.tick(FPS)
         WIN.fill("black")
         
@@ -119,7 +124,7 @@ def main():
         if player.rect.right >= WIDTH:
             player.rect.right = WIDTH
 
-        draw(player, enemies, font, level)
+        draw(player, enemies, font, level, frame)
 
     pygame.quit()
 
@@ -143,7 +148,22 @@ def paused():
     pygame.display.flip()
 
     waiting = True
+    frame = 0
+
     while waiting:
+
+        frame += 1
+        WIN.blit(overlay, (0,0))
+
+        float_offset_x = math.sin(frame * 0.001) * 5
+        float_offset_y = math.sin(frame * 0.001 * 2) * 2
+
+        pausedTextRect = pausedText.get_rect(center=(WIDTH//2 + float_offset_x, 100 + float_offset_y))
+        unpauseTextRect = unpauseText.get_rect(center=(WIDTH//2 - float_offset_x, HEIGHT//2 - float_offset_y))
+
+        WIN.blit(pausedText, pausedTextRect)
+        WIN.blit(unpauseText, unpauseTextRect)
+
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -151,24 +171,34 @@ def paused():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+        pygame.display.flip()
 
 def gameOver(finalLevel):
     font = pygame.font.Font(None, 48)
     smallFont = pygame.font.Font(None, 32)
+    
+    gameOverText = font.render("Game Over", True, (255, 0, 0))
+    levelText = smallFont.render(f"Level Reached: {finalLevel}", True, (255, 255, 255))
+    clickText = smallFont.render("Click to return to menu", True, (200, 200, 200))
+    
+    frame = 0
+    clock = pygame.time.Clock()
 
     while True:
+        frame += 1
+        clock.tick(FPS)
         WIN.fill("black")
+        
+        float_offset_x = math.sin(frame * 0.001) * 5
+        float_offset_y = math.sin(frame * 0.001 * 2) * 2
 
-        gameOverText = font.render("Game Over", True, (255, 0, 0))
-        gameOverRect = gameOverText.get_rect(center=(WIDTH//2, HEIGHT//2 - 50))
+        gameOverRect = gameOverText.get_rect(center=(WIDTH//2 + float_offset_x, HEIGHT//2 - 50 + float_offset_y))
         WIN.blit(gameOverText, gameOverRect)
 
-        levelText = smallFont.render(f"Level Reached: {finalLevel}", True, (255, 255, 255))
-        levelRect = levelText.get_rect(center=(WIDTH//2, HEIGHT//2 + 20))
+        levelRect = levelText.get_rect(center=(WIDTH//2 - float_offset_x, HEIGHT//2 + 20 - float_offset_y))
         WIN.blit(levelText, levelRect)
 
-        clickText = smallFont.render("Click to return to menu", True, (200, 200, 200))
-        clickRect = clickText.get_rect(center=(WIDTH//2, HEIGHT//2 + 80))
+        clickRect = clickText.get_rect(center=(WIDTH//2 + float_offset_x, HEIGHT//2 + 80 + float_offset_y))
         WIN.blit(clickText, clickRect)
 
         pygame.display.flip()
@@ -191,9 +221,20 @@ def mainMenu():
 
     startButton = pygame.Rect(WIDTH//2 - 100, HEIGHT//2 -30, 200, 60)
     font = pygame.font.Font(None, 48)
+    
+    highScoreText = font.render(f"High Score: {highscore}", True, (255, 255, 255))
+    startText = font.render("START", True, (255, 255, 255))
+    
+    frame = 0
+    clock = pygame.time.Clock()
 
     while True:
+        frame += 1
+        clock.tick(FPS)
         mousePOS = pygame.mouse.get_pos()
+        
+        float_offset_x = math.sin(frame * 0.001) * 5
+        float_offset_y = math.sin(frame * 0.001 * 2) * 2
 
         if startButton.collidepoint(mousePOS):
             buttonColor = (100, 100, 100)
@@ -202,12 +243,10 @@ def mainMenu():
     
         WIN.fill("black")
 
-        highScoreText = font.render(f"High Score: {highscore}", True, (255, 255, 255))
-        highScoreRect = highScoreText.get_rect(center=(WIDTH//2, 100))
+        highScoreRect = highScoreText.get_rect(center=(WIDTH//2 + float_offset_x, 100 + float_offset_y))
         WIN.blit(highScoreText, highScoreRect)
 
         pygame.draw.rect(WIN, buttonColor, startButton)
-        startText = font.render("START", True, (255, 255, 255))
         startRect = startText.get_rect(center=(startButton.center))
         WIN.blit(startText, startRect)
 
