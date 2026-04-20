@@ -70,6 +70,9 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 break
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused()
         
         if level != 0 and level % 8 == 0 and not healedThisLevel:
             player.Health = 100
@@ -120,6 +123,34 @@ def main():
 
     pygame.quit()
 
+def paused():
+    overlay = pygame.Surface((WIDTH, HEIGHT))
+    overlay.set_alpha(180)
+    overlay.fill("black")
+
+    fontLarge = pygame.font.SysFont("Aerial", 64, bold=True)
+    fontSmall = pygame.font.SysFont("Aerial", 32)
+
+    pausedText = fontLarge.render("Game Paused", True, (255, 255, 255))
+    pausedTextRect = pausedText.get_rect(center=(WIDTH//2, 100))
+
+    unpauseText = fontSmall.render("Press ESC to Unpause", True, (255, 255, 255))
+    unpauseTextRect = unpauseText.get_rect(center=(WIDTH//2, HEIGHT//2))
+
+    WIN.blit(overlay, (0,0))
+    WIN.blit(pausedText, pausedTextRect)
+    WIN.blit(unpauseText, unpauseTextRect)
+    pygame.display.flip()
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    waiting = False  # Resume
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
 def gameOver(finalLevel):
     font = pygame.font.Font(None, 48)
