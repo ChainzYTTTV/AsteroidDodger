@@ -233,8 +233,10 @@ def mainMenu():
         clock.tick(FPS)
         mousePOS = pygame.mouse.get_pos()
         
-        float_offset_x = math.sin(frame * 0.001) * 5
-        float_offset_y = math.sin(frame * 0.001 * 2) * 2
+        # Create infinity sign pattern using parametric equations
+        t = frame * 0.01
+        float_offset_x = math.cos(t) * 20
+        float_offset_y = math.sin(t) * math.cos(t) * 20
 
         if startButton.collidepoint(mousePOS):
             buttonColor = (100, 100, 100)
@@ -244,6 +246,7 @@ def mainMenu():
         WIN.fill("black")
 
         highScoreRect = highScoreText.get_rect(center=(WIDTH//2 + float_offset_x, 100 + float_offset_y))
+
         WIN.blit(highScoreText, highScoreRect)
 
         pygame.draw.rect(WIN, buttonColor, startButton)
