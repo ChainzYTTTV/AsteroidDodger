@@ -78,7 +78,10 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused()
-        
+
+        if keys[pygame.K_LALT] or keys[pygame.K_RALT] and keys[pygame.K_TAB]:
+            paused()
+
         if level != 0 and level % 8 == 0 and not healedThisLevel:
             player.Health = 100
             healedThisLevel = True
